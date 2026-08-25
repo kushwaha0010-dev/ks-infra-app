@@ -20,14 +20,15 @@ jobs:
 
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.0'
         channel: 'stable'
 
-    - name: Create Clean Android Structure & Fix Kotlin
+    - name: Setup Android Project & Latest Target SDK
       run: |
         flutter create --org com.ksinfra --project-name ks_infra_interiors temp_app
         cp -r temp_app/android ./android
         rm -rf temp_app
+        sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle
+        sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle
         sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle
         sed -i 's/kotlin-gradle-plugin:1\.[0-9]\+\.[0-9]\+/kotlin-gradle-plugin:1.9.10/' android/build.gradle || true
         sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.10"/' android/settings.gradle || true
