@@ -22,16 +22,26 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Setup Android Project & Latest Target SDK
+    - name: Setup Android Project & Custom Logo
       run: |
-        flutter create --org com.ksinfra --project-name ks_infra_interiors temp_app
-        cp -r temp_app/android ./android
-        rm -rf temp_app
+        flutter create --org com.ksinfra --project-name ks_infra_interiors .
         sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle
         sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle
-        sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle
-        sed -i 's/kotlin-gradle-plugin:1\.[0-9]\+\.[0-9]\+/kotlin-gradle-plugin:1.9.10/' android/build.gradle || true
-        sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.10"/' android/settings.gradle || true
+        sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle || true
+        
+        # Apply Custom Logo to App Icon if logo.png exists
+        if [ -f logo.png ]; then
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          cp logo.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp logo.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp logo.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp logo.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp logo.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+        fi
 
     - name: Install dependencies
       run: flutter pub get
