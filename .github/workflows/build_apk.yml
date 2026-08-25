@@ -10,12 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.19.0'
         channel: 'stable'
+
+    - name: Setup Android Project
+      run: flutter create . --platforms=android
 
     - name: Install dependencies
       run: flutter pub get
