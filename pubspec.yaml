@@ -1,0 +1,15 @@
+name: ks_infra_interiors
+description: Staff and Site Management App for KS Infra Interiors.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  geolocator: ^10.1.0
+  intl: ^0.18.1
+
+flutter:
+  uses-material-design: true
