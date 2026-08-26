@@ -23,18 +23,20 @@ jobs:
         flutter-version: '3.19.0'
         channel: 'stable'
 
-    - name: Generate Android Setup & Custom Logo
+    - name: Setup Android Structure Safely
       run: |
+        flutter create --org com.ksinfra --project-name ks_infra_interiors temp_dir
         rm -rf android
-        flutter create . --platforms=android --org com.ksinfra --project-name ks_infra_interiors
+        cp -r temp_dir/android ./android
+        rm -rf temp_dir
         
-        # Configure Target SDK 34 and Kotlin 1.9.10
+        # Apply Kotlin & SDK Configuration
         sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle || true
         sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle || true
         sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle || true
         sed -i 's/kotlin-gradle-plugin:1\.[0-9]\+\.[0-9]\+/kotlin-gradle-plugin:1.9.10/' android/build.gradle || true
 
-        # Apply Custom Logo to App Icon if logo.png exists
+        # Set App Icon if logo.png is present
         if [ -f logo.png ]; then
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-mdpi
@@ -52,7 +54,7 @@ jobs:
       run: flutter pub get
 
     - name: Build Release APK
-      run: flutter build apk --release --no-tree-shake-icons
+      run: flutter build apk --release
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
