@@ -22,18 +22,17 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Generate Android Folder Safely
+    - name: Clean and Initialize Android Support
       run: |
-        flutter create --org com.ksinfra --project-name ks_infra_interiors temp_project
-        cp -r temp_project/android ./android
-        rm -rf temp_project
+        rm -rf android
+        flutter create . --platforms=android --org com.ksinfra --project-name ks_infra_interiors
         
-        # Apply configurations
-        sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle
-        sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle
+        # Configure SDK 34 and Kotlin version
+        sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle || true
+        sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle || true
         sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle || true
 
-        # Apply Custom Logo if logo.png is uploaded
+        # Apply Custom Logo if logo.png exists
         if [ -f logo.png ]; then
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-mdpi
