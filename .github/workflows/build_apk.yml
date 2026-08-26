@@ -22,14 +22,18 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Setup Android Project & Custom Logo
+    - name: Generate Android Folder Safely
       run: |
-        flutter create --org com.ksinfra --project-name ks_infra_interiors .
+        flutter create --org com.ksinfra --project-name ks_infra_interiors temp_project
+        cp -r temp_project/android ./android
+        rm -rf temp_project
+        
+        # Apply configurations
         sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle
         sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle
         sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle || true
-        
-        # Apply Custom Logo to App Icon if logo.png exists
+
+        # Apply Custom Logo if logo.png is uploaded
         if [ -f logo.png ]; then
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-mdpi
