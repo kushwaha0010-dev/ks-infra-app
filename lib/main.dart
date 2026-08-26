@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Admin login shortcut for testing
+    // Admin login trigger
     if (_phoneController.text == '9999999999') {
       Navigator.pushReplacement(
         context,
@@ -61,11 +61,10 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please fill name and email for onboarding documents')),
+          const SnackBar(content: Text('Please fill name and email for onboarding')),
         );
         return;
       }
-      // Proceed to Employee Dashboard after document upload simulation
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -92,7 +91,13 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.business_center, size: 64, color: Color(0xFF0072FF)),
+                  Image.asset(
+                    'logo.png',
+                    height: 64,
+                    width: 64,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.business_center, size: 64, color: Color(0xFF0072FF)),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'KS Infra Interiors',
@@ -133,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     OutlinedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Document (Aadhaar/PAN) Uploaded Successfully! Pending Admin Approval.')),
+                          const SnackBar(content: Text('Document (Aadhaar/PAN) Uploaded! Pending Approval.')),
                         );
                       },
                       icon: const Icon(Icons.upload_file),
@@ -157,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Admin Login: Use 9999999999',
+                    'Admin Portal Demo: Enter 9999999999',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -208,13 +213,13 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
       checkInTime = DateTime.now();
       siteName = _siteController.text;
 
-      // Rule: Arrival 9:00 AM, Buffer till 9:30 AM. After 9:30 AM -> ₹50 penalty
+      // 9:00 AM shift start, buffer till 9:30 AM. Beyond 9:30 AM -> Rs 50 penalty
       final hour = checkInTime!.hour;
       final minute = checkInTime!.minute;
       if (hour > 9 || (hour == 9 && minute > 30)) {
         penaltyAmount += 50.0;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Late arrival! ₹50 penalty applied automatically.')),
+          const SnackBar(content: Text('Late Check-in! ₹50 penalty applied automatically.')),
         );
       }
     });
@@ -225,7 +230,6 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
     final checkOutTime = DateTime.now();
     final duration = checkOutTime.difference(checkInTime!);
     
-    // 8 Hours standard shift. Anything beyond 8 hours is OT
     double workedHours = duration.inMinutes / 60.0;
     if (workedHours > 8.0) {
       otHours += (workedHours - 8.0);
@@ -245,7 +249,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Checked Out Successfully. Attendance recorded!')),
+      const SnackBar(content: Text('Checked Out Successfully.')),
     );
   }
 
@@ -253,7 +257,18 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome, ${widget.employeeName}'),
+        title: Row(
+          children: [
+            Image.asset(
+              'logo.png',
+              height: 28,
+              width: 28,
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.business, color: Colors.white),
+            ),
+            const SizedBox(width: 10),
+            Text('KS Infra (${widget.employeeName})'),
+          ],
+        ),
         backgroundColor: const Color(0xFF0072FF),
         foregroundColor: Colors.white,
         actions: [
@@ -271,7 +286,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Financial & Ledger Summary Card
+            // Financial Ledger
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -299,7 +314,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
             ),
             const SizedBox(height: 20),
 
-            // Check-in / Check-out Widget
+            // Attendance Panel
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -332,7 +347,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                       ),
                     ] else ...[
                       Text('Active Site: $siteName', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-                      const Text('GPS Location: Lat 28.4595, Long 77.0266 (Faridabad)', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('GPS Location: Verified Active Site', style: TextStyle(color: Colors.grey, fontSize: 12)),
                       const SizedBox(height: 12),
                       ElevatedButton.icon(
                         onPressed: _performCheckOut,
@@ -351,11 +366,11 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
             ),
             const SizedBox(height: 20),
 
-            // Material & Payment Receipt Upload
+            // Material Bill Upload
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Material & Payment Receipt uploaded successfully. Sent to Admin for approval!')),
+                  const SnackBar(content: Text('Receipt uploaded and submitted to Admin for approval!')),
                 );
               },
               icon: const Icon(Icons.receipt_long),
@@ -369,7 +384,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
             ),
             const SizedBox(height: 20),
 
-            // Past Attendance History
+            // Past History
             const Text('Past Attendance History', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             history.isEmpty
@@ -429,42 +444,34 @@ class AdminDashboard extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text('Employee Management & Approvals', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Employee Onboarding Approvals', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Card(
             child: ListTile(
-              leading: const CircleAvatar(backgroundColor: Colors.blue, child: Text('RK')),
-              title: const Text('Rahul Kumar (Electrician)'),
-              subtitle: const Text('Documents: Aadhaar/PAN Uploaded\nStatus: Pending Onboarding Approval'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Employee On Approved List!')),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.orange),
-                    onPressed: () {},
-                  ),
-                ],
+              leading: const CircleAvatar(backgroundColor: Colors.blue, child: Text('EMP')),
+              title: const Text('Rahul Kumar'),
+              subtitle: const Text('Documents: Aadhaar & PAN\nStatus: Pending Approval'),
+              trailing: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Employee KYC Approved!')),
+                ),
+                child: const Text('Approve'),
               ),
             ),
           ),
           const SizedBox(height: 20),
-          const Text('Pending Receipts & Material Bills Approval', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Pending Material & Expense Bills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Card(
             child: ListTile(
               leading: const Icon(Icons.receipt, color: Colors.purple),
-              title: const Text('Material Bill #104 - ₹4,500'),
-              subtitle: const Text('Uploaded by: Rahul Kumar\nSite: Sector 29 Interior'),
+              title: const Text('Site Material Bill - ₹4,500'),
+              subtitle: const Text('Uploaded by: Rahul Kumar\nSite: Faridabad Sector 29'),
               trailing: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
                 onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Receipt Approved and Added to Ledger!')),
+                  const SnackBar(content: Text('Bill Approved and Added to Ledger!')),
                 ),
                 child: const Text('Approve'),
               ),
