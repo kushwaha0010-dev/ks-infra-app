@@ -20,19 +20,21 @@ jobs:
 
     - uses: subosito/flutter-action@v2
       with:
+        flutter-version: '3.19.0'
         channel: 'stable'
 
-    - name: Clean and Initialize Android Support
+    - name: Generate Android Setup & Custom Logo
       run: |
         rm -rf android
         flutter create . --platforms=android --org com.ksinfra --project-name ks_infra_interiors
         
-        # Configure SDK 34 and Kotlin version
+        # Configure Target SDK 34 and Kotlin 1.9.10
         sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle || true
         sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/' android/app/build.gradle || true
         sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.10"/' android/build.gradle || true
+        sed -i 's/kotlin-gradle-plugin:1\.[0-9]\+\.[0-9]\+/kotlin-gradle-plugin:1.9.10/' android/build.gradle || true
 
-        # Apply Custom Logo if logo.png exists
+        # Apply Custom Logo to App Icon if logo.png exists
         if [ -f logo.png ]; then
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-mdpi
@@ -49,7 +51,7 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Build APK
+    - name: Build Release APK
       run: flutter build apk --release --no-tree-shake-icons
 
     - name: Upload APK
