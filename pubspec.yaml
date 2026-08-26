@@ -8,8 +8,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  geolocator: ^10.1.0
   intl: ^0.18.1
 
 flutter:
   uses-material-design: true
+  assets:
+    - logo.png
