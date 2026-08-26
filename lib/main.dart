@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 void main() {
   runApp(const KSInfraApp());
@@ -16,14 +15,12 @@ class KSInfraApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-        fontFamily: 'Roboto',
       ),
       home: const LoginScreen(),
     );
   }
 }
 
-// ==================== 1. LOGIN & ONBOARDING ====================
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -45,7 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Admin login trigger
     if (_phoneController.text == '9999999999') {
       Navigator.pushReplacement(
         context,
@@ -61,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please fill name and email for onboarding')),
+          const SnackBar(content: Text('Please fill name and email')),
         );
         return;
       }
@@ -91,13 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset(
-                    'logo.png',
-                    height: 64,
-                    width: 64,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.business_center, size: 64, color: Color(0xFF0072FF)),
-                  ),
+                  const Icon(Icons.business_center, size: 64, color: Color(0xFF0072FF)),
                   const SizedBox(height: 16),
                   const Text(
                     'KS Infra Interiors',
@@ -138,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     OutlinedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Document (Aadhaar/PAN) Uploaded! Pending Approval.')),
+                          const SnackBar(content: Text('Documents Uploaded! Pending Admin Approval.')),
                         );
                       },
                       icon: const Icon(Icons.upload_file),
@@ -162,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Admin Portal Demo: Enter 9999999999',
+                    'Admin Portal Login: 9999999999',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -175,7 +165,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// ==================== 2. EMPLOYEE DASHBOARD ====================
 class EmployeeDashboard extends StatefulWidget {
   final String employeeName;
   final String employeePhone;
@@ -213,13 +202,12 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
       checkInTime = DateTime.now();
       siteName = _siteController.text;
 
-      // 9:00 AM shift start, buffer till 9:30 AM. Beyond 9:30 AM -> Rs 50 penalty
       final hour = checkInTime!.hour;
       final minute = checkInTime!.minute;
       if (hour > 9 || (hour == 9 && minute > 30)) {
         penaltyAmount += 50.0;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Late Check-in! ₹50 penalty applied automatically.')),
+          const SnackBar(content: Text('Late arrival! ₹50 penalty applied automatically.')),
         );
       }
     });
@@ -238,10 +226,10 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
     setState(() {
       isCheckedIn = false;
       history.insert(0, {
-        'date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        'date': '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}',
         'site': siteName,
-        'checkIn': DateFormat('hh:mm a').format(checkInTime!),
-        'checkOut': DateFormat('hh:mm a').format(checkOutTime),
+        'checkIn': '${checkInTime!.hour}:${checkInTime!.minute.toString().padLeft(2, '0')}',
+        'checkOut': '${checkOutTime.hour}:${checkOutTime.minute.toString().padLeft(2, '0')}',
         'ot': (workedHours > 8 ? workedHours - 8 : 0).toStringAsFixed(1),
       });
       siteName = '';
@@ -257,18 +245,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              'logo.png',
-              height: 28,
-              width: 28,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.business, color: Colors.white),
-            ),
-            const SizedBox(width: 10),
-            Text('KS Infra (${widget.employeeName})'),
-          ],
-        ),
+        title: Text('KS Infra (${widget.employeeName})'),
         backgroundColor: const Color(0xFF0072FF),
         foregroundColor: Colors.white,
         actions: [
@@ -286,7 +263,6 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Financial Ledger
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -313,8 +289,6 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Attendance Panel
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -365,12 +339,10 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Material Bill Upload
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Receipt uploaded and submitted to Admin for approval!')),
+                  const SnackBar(content: Text('Material Receipt uploaded and submitted for Approval!')),
                 );
               },
               icon: const Icon(Icons.receipt_long),
@@ -383,8 +355,6 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Past History
             const Text('Past Attendance History', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             history.isEmpty
@@ -420,7 +390,6 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
   }
 }
 
-// ==================== 3. ADMIN DASHBOARD ====================
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
 
